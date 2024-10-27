@@ -110,7 +110,7 @@ public class LinkedListTabulatedFunctionTest {
         assertEquals(3, function.extrapolateLeft(0), 0.01);
         assertEquals(3.5, function.extrapolateLeft(0.5), 0.01);
     }
-
+    @Test
     public void testExtrapolateRight() {
         double[] xValues = {1, 2, 3};
         double[] yValues = {4, 5, 6};
@@ -120,54 +120,66 @@ public class LinkedListTabulatedFunctionTest {
     }
     @Test
     public void testToString() {
-        double[] xArray = {9, 6.7, 4.5, 10};
-        double[] yArray = {8, 7, 2, 1.8};
-        LinkedListTabulatedFunction linkedList = new LinkedListTabulatedFunction(xArray, yArray);
+        double[] xValues = {1.0, 2.0, 3.0};
+        double[] yValues = {2.0, 4.0, 6.0};
+        LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(xValues, yValues);
 
-        String expectedString = "(9.0; 8.0); (6.7; 7.0); (4.5; 2.0); (10.0; 1.8)";
-        assertEquals(expectedString, linkedList.toString());
+        String expected = "[1.0, 2.0], [2.0, 4.0], [3.0, 6.0]";
+        assertEquals(expected, function.toString());
+
+        double[] xValues2 = {1.23, 2.45, 3.67};
+        double[] yValues2 = {4.56, 5.78, 6.90};
+        function = new LinkedListTabulatedFunction(xValues2, yValues2);
+
+        String expected2 = "[1.23, 4.56], [2.45, 5.78], [3.67, 6.9]";
+        assertEquals(expected2, function.toString());
     }
     @Test
     public void testEquals() {
-        double[] xArray1 = {1, 2, 4.5, 10};
-        double[] yArray1 = {0, 3, 2, 1.1};
-        LinkedListTabulatedFunction linkedList1 = new LinkedListTabulatedFunction(xArray1, yArray1);
+        double[] xValues1 = {1.0, 2.0, 3.0};
+        double[] yValues1 = {2.0, 4.0, 6.0};
+        LinkedListTabulatedFunction function1 = new LinkedListTabulatedFunction(xValues1, yValues1);
+        assertTrue(function1.equals(function1));
+        LinkedListTabulatedFunction function2 = new LinkedListTabulatedFunction(xValues1, yValues1);
+        assertTrue(function1.equals(function2));
+        double[] yValues2 = {2.0, 4.0, 6.1};
+        LinkedListTabulatedFunction function3 = new LinkedListTabulatedFunction(xValues1, yValues2);
+        assertFalse(function1.equals(function3));
+        double[] xValues3 = {1.0, 2.0};
+        double[] yValues3 = {2.0, 4.0};
+        LinkedListTabulatedFunction function4 = new LinkedListTabulatedFunction(xValues3, yValues3);
+        assertFalse(function1.equals(function4));
 
-        double[] xArray2 = {1, 2, 4.5, 10};
-        double[] yArray2 = {0, 3, 2, 1.1};
-        LinkedListTabulatedFunction linkedList2 = new LinkedListTabulatedFunction(xArray2, yArray2);
+        assertFalse(function1.equals(null));
 
-        Assertions.assertTrue(linkedList1.equals(linkedList2));
+        assertFalse(function1.equals("not a function"));
     }
-    @Test
-    public void testNotEquals() {
-        double[] xArray1 = {1, 2, 4.5, 10};
-        double[] yArray1 = {0, 3, 2, 1.1};
-        LinkedListTabulatedFunction linkedList1 = new LinkedListTabulatedFunction(xArray1, yArray1);
 
-        double[] xArray2 = {1, 3, 4.5, 10};
-        double[] yArray2 = {0, 2, 2, 1.1};
-        LinkedListTabulatedFunction linkedList2 = new LinkedListTabulatedFunction(xArray2, yArray2);
-
-        Assertions.assertFalse(linkedList1.equals(linkedList2));
-    }
     @Test
     public void testHashCode() {
-        double[] xArray = {1, 2, 4.5, 10};
-        double[] yArray = {0, 3, 2, 1.1};
-        LinkedListTabulatedFunction linkedList1 = new LinkedListTabulatedFunction(xArray, yArray);
-        LinkedListTabulatedFunction linkedList2 = new LinkedListTabulatedFunction(xArray, yArray);
-        assertEquals(linkedList1.hashCode(), linkedList2.hashCode());
+        double[] xValues = {1.0, 2.0, 3.0};
+        double[] yValues = {2.0, 4.0, 6.0};
+        LinkedListTabulatedFunction function1 = new LinkedListTabulatedFunction(xValues, yValues);
+        LinkedListTabulatedFunction function2 = new LinkedListTabulatedFunction(xValues, yValues);
+
+        assertEquals(function1.hashCode(), function2.hashCode());
+
+        double[] yValues2 = {2.0, 4.0, 6.1};
+        LinkedListTabulatedFunction function3 = new LinkedListTabulatedFunction(xValues, yValues2);
+        assertNotEquals(function1.hashCode(), function3.hashCode());
     }
+
     @Test
     public void testClone() {
-        double[] xArray = {1, 2, 4.5, 10};
-        double[] yArray = {0, 3, 2, 1.1};
-        LinkedListTabulatedFunction function1 = new LinkedListTabulatedFunction(xArray, yArray);
-        LinkedListTabulatedFunction clonedFunction = (LinkedListTabulatedFunction) function1.clone();
-        assertNotSame(function1, clonedFunction);
-        assertTrue(function1.equals(clonedFunction));
-        clonedFunction.setY(0, 99.0);
-        assertNotEquals(function1.getY(0), clonedFunction.getY(0));
+        double[] xValues = {1.0, 2.0, 3.0};
+        double[] yValues = {2.0, 4.0, 6.0};
+        LinkedListTabulatedFunction original = new LinkedListTabulatedFunction(xValues, yValues);
+        LinkedListTabulatedFunction clone = (LinkedListTabulatedFunction) original.clone();
+        assertNotSame(original, clone);
+        assertEquals(original, clone);
+        clone.setY(0, 10.0);
+        assertNotEquals(original.getY(0), clone.getY(0));
+        assertEquals(2.0, original.getY(0));
+        assertEquals(10.0, clone.getY(0));
     }
 }

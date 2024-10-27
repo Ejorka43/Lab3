@@ -189,16 +189,20 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction {
     }
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder();
+        StringBuilder builder = new StringBuilder();
         Node current = head;
+        builder.append('[');
         for (int i = 0; i < count; i++) {
-            result.append(current.toString());
+            builder.append(current.x)
+                    .append(", ")
+                    .append(current.y);
             if (i < count - 1) {
-                result.append("; "); //"; " между точками
+                builder.append("], [");
             }
             current = current.next;
         }
-        return result.toString();
+        builder.append(']');
+        return builder.toString();
     }
 
     @Override
@@ -206,11 +210,14 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         LinkedListTabulatedFunction that = (LinkedListTabulatedFunction) o;
-        if (this.count != that.count) return false;
+        if (count != that.count) return false;
         Node thisNode = this.head;
         Node thatNode = that.head;
         for (int i = 0; i < count; i++) {
-            if (!thisNode.equals(thatNode)) return false;
+            if (Double.compare(thisNode.x, thatNode.x) != 0 ||
+                    Double.compare(thisNode.y, thatNode.y) != 0) {
+                return false;
+            }
             thisNode = thisNode.next;
             thatNode = thatNode.next;
         }
@@ -219,14 +226,18 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction {
 
     @Override
     public int hashCode() {
-        int hash = 1;
+        int result = 31 * count;
         Node current = head;
         for (int i = 0; i < count; i++) {
-            hash = 31 * hash + current.hashCode();
+            long temp = Double.doubleToLongBits(current.x);
+            result = 31 * result + (int) (temp ^ (temp >>> 32));
+            temp = Double.doubleToLongBits(current.y);
+            result = 31 * result + (int) (temp ^ (temp >>> 32));
             current = current.next;
         }
-        return hash;
+        return result;
     }
+
     @Override
     public Object clone() {
         double[] xValues = new double[count];
