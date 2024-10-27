@@ -111,4 +111,34 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction {
     protected double interpolate(double x, int floorIndex) {
         return interpolate(x, xValues[floorIndex], xValues[floorIndex + 1], yValues[floorIndex], yValues[floorIndex + 1]);
     }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder("ArrayTabulatedFunction:\n");
+        for (int i = 0; i < count; i++) {
+            builder.append("x: ").append(xValues[i]).append(", y: ").append(yValues[i]).append("\n");
+        }
+        return builder.toString();
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ArrayTabulatedFunction)) return false;
+        ArrayTabulatedFunction other = (ArrayTabulatedFunction) o;
+        return Arrays.equals(this.xValues, other.xValues) && Arrays.equals(this.yValues, other.yValues);
+    }
+    @Override
+    public int hashCode() {
+        int result = Arrays.hashCode(xValues);
+        result = 31 * result + Arrays.hashCode(yValues);
+        return result;
+    }
+    @Override
+    public ArrayTabulatedFunction clone() {
+        ArrayTabulatedFunction clone = new ArrayTabulatedFunction(
+                Arrays.copyOf(this.xValues, this.xValues.length),
+                Arrays.copyOf(this.yValues, this.yValues.length)
+        );
+        return clone;
+    }
 }

@@ -2,7 +2,7 @@ package functions;
 
 
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class ArrayTabulatedFunctionTest {
@@ -69,5 +69,39 @@ public class ArrayTabulatedFunctionTest {
 
         assertEquals(1, function.floorIndexOfX(2.5));
         assertEquals(2, function.floorIndexOfX(3.5));
+    }
+    @Test
+    public void testToString() {
+        double[] xValues = {1, 2, 3};
+        double[] yValues = {4, 5, 6};
+        ArrayTabulatedFunction func = new ArrayTabulatedFunction(xValues, yValues);
+        assertEquals("ArrayTabulatedFunction:\nx: 1.0, y: 4.0\nx: 2.0, y: 5.0\nx: 3.0, y: 6.0\n", func.toString());
+    }
+    @Test
+    public void testEquals() {
+        double[] xValues = {1, 2, 3};
+        double[] yValues = {4, 5, 6};
+        ArrayTabulatedFunction func1 = new ArrayTabulatedFunction(xValues, yValues);
+        ArrayTabulatedFunction func2 = new ArrayTabulatedFunction(xValues, yValues);
+        assertEquals(func1, func2);
+    }
+
+    @Test
+    public void testHashCode() {
+        double[] xValues = {1, 2, 3};
+        double[] yValues = {4, 5, 6};
+        ArrayTabulatedFunction func1 = new ArrayTabulatedFunction(xValues, yValues);
+        ArrayTabulatedFunction func2 = new ArrayTabulatedFunction(xValues, yValues);
+        assertEquals(func1.hashCode(), func2.hashCode());
+    }
+
+    @Test
+    public void testClone() throws CloneNotSupportedException {
+        double[] x = {1, 2, 3};
+        double[] y = {4, 5, 6};
+        ArrayTabulatedFunction func = new ArrayTabulatedFunction(x, y);
+        ArrayTabulatedFunction clonedFunc = (ArrayTabulatedFunction) func.clone();
+        assertNotSame(func, clonedFunc);
+        assertTrue(func.equals(clonedFunc));
     }
 }

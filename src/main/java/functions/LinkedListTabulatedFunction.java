@@ -2,30 +2,61 @@ package functions;
 
 public class LinkedListTabulatedFunction extends AbstractTabulatedFunction {
     private Node head;
-    private int count;
+    private int count = 0;
 
-    private static class Node {
+    static final class Node {
         public Node next;
         public Node prev;
         public double x;
         public double y;
+
+        public Node(double x, double y) {
+            this.x = x;
+            this.y = y;
+        }
+        @Override
+        public String toString() {
+            return "("+ x+ "; " + y+ ")";
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            Node node = (Node) o;
+
+            return Double.compare(node.x, x) == 0 && Double.compare(node.y, y) == 0;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = 17;
+            long xBits = Double.doubleToLongBits(x);
+            long yBits = Double.doubleToLongBits(y);
+            result = 31 * result + (int) (xBits ^ (xBits >>> 32));
+            result = 31 * result + (int) (yBits ^ (yBits >>> 32));
+            return result;
+        }
+
+        @Override
+        public Object clone() {
+            return new Node(this.x, this.y);
+        }
     }
 
-    private void addNode(double x, double y) {
-        Node newNode = new Node();
-        newNode.x = x;
-        newNode.y = y;
-        if (head == null) {
-            head = newNode;
-            newNode.next = newNode;
-            newNode.prev = newNode;
-        }
-        else {
+    protected void addNode(double x, double y) {
+        Node p = new Node(x, y);
+        if (head != null) {
             Node last = head.prev;
-            last.next = newNode;
-            newNode.prev = last;
-            newNode.next = head;
-            head.prev = newNode;
+            p.prev = last;
+            p.next = head;
+            last.next = p;
+            head.prev = p;
+        } else {
+            head = p;
+            head.next = head;
+            head.prev = head;
         }
         count++;
     }
@@ -103,39 +134,41 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction {
     @Override
     public int indexOfX(double x) {
         Node current = head;
-        do {
-            if (current.x == x) {
-                return 0;
+        for (int i = 0; i<count; i++){
+            if (current.x == x){
+                return i;
             }
             current = current.next;
-        } while (current != head);
+        }
         return -1;
     }
 
     @Override
     public int indexOfY(double y) {
         Node current = head;
-        do {
-            if (current.y == y) {
-                return 0;
+        for (int i = 0; i<count; i++){
+            if (current.y == y){
+                return i;
             }
             current = current.next;
-        } while (current != head);
+        }
         return -1;
     }
-
     @Override
     protected int floorIndexOfX(double x) {
+        if (x <= head.x) {
+            return 0;
+        }
+        if (x >= head.prev.x) {
+            return count - 1;
+        }
         Node current = head;
         int index = 0;
-        do {
-            if (current.x >= x) {
-                return index - 1;
-            }
+        while (current != head.prev && current.x <= x) {
             current = current.next;
-            index++;
-        } while (current != head);
-        return count - 1;
+            ++index;
+        }
+        return index - 1;
     }
 
     @Override
@@ -153,5 +186,57 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction {
         Node left = getNode(floorIndex);
         Node right = left.next;
         return interpolate(x, left.x, right.x, left.y, right.y);
+    }
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        Node current = head;
+        for (int i = 0; i < count; i++) {
+            result.append(current.toString());
+            if (i < count - 1) {
+                result.append("; "); //"; " между точками
+            }
+            current = current.next;
+        }
+        return result.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LinkedListTabulatedFunction that = (LinkedListTabulatedFunction) o;
+        if (this.count != that.count) return false;
+        Node thisNode = this.head;
+        Node thatNode = that.head;
+        for (int i = 0; i < count; i++) {
+            if (!thisNode.equals(thatNode)) return false;
+            thisNode = thisNode.next;
+            thatNode = thatNode.next;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 1;
+        Node current = head;
+        for (int i = 0; i < count; i++) {
+            hash = 31 * hash + current.hashCode();
+            current = current.next;
+        }
+        return hash;
+    }
+    @Override
+    public Object clone() {
+        double[] xValues = new double[count];
+        double[] yValues = new double[count];
+        Node current = head;
+        for (int i = 0; i < count; i++) {
+            xValues[i] = current.x;
+            yValues[i] = current.y;
+            current = current.next;
+        }
+        return new LinkedListTabulatedFunction(xValues, yValues);
     }
 }
